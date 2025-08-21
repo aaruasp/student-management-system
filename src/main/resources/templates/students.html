@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="#">Student Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/students}">Student Management</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- ✅ Alerts -->
+    <div th:if="${param.success}" class="alert alert-success">Student added successfully!</div>
+    <div th:if="${param.updated}" class="alert alert-info">Student updated successfully!</div>
+    <div th:if="${param.deleted}" class="alert alert-danger">Student deleted successfully!</div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2>List Students</h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <a th:href="@{/students/new}" class="btn btn-primary btn-sm">+ Add Student</a>
+        </div>
+    </div>
+
+    <!-- ✅ Search Form -->
+    <form th:action="@{/students}" method="get" class="form-inline my-3">
+        <input type="text" name="keyword" class="form-control mr-2" placeholder="Search by name or email"
+               th:value="${keyword}">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        <a th:href="@{/students}" class="btn btn-outline-secondary ml-2">Clear</a>
+    </form>
+
+    <!-- ✅ Students Table -->
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>
+                <a th:href="@{/students(page=${currentPage}, sortField='firstName', sortDir=${reverseSortDir})}"
+                   style="color:white; text-decoration:none;">
+                    First Name
+                    <span th:text="${sortField == 'firstName' ? (sortDir == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/students(page=${currentPage}, sortField='lastName', sortDir=${reverseSortDir})}"
+                   style="color:white; text-decoration:none;">
+                    Last Name
+                    <span th:text="${sortField == 'lastName' ? (sortDir == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/students(page=${currentPage}, sortField='email', sortDir=${reverseSortDir})}"
+                   style="color:white; text-decoration:none;">
+                    Email
+                    <span th:text="${sortField == 'email' ? (sortDir == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student: ${students}">
+            <td th:text="${student.firstName}"></td>
+            <td th:text="${student.lastName}"></td>
+            <td th:text="${student.email}"></td>
+            <td>
+                <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-sm btn-primary">Update</a>
+                <a th:href="@{/students/{id}(id=${student.id})}"
+                   onclick="return confirm('Are you sure you want to delete this student?');"
+                   class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- ✅ Pagination -->
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li th:classappend="${currentPage == 0} ? 'disabled'" class="page-item">
+                <a class="page-link"
+                   th:href="@{/students(page=${currentPage-1}, sortField=${sortField}, sortDir=${sortDir})}">
+                    Previous
+                </a>
+            </li>
+
+            <li th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+                th:classappend="${i == currentPage} ? 'active'" class="page-item">
+                <a class="page-link"
+                   th:href="@{/students(page=${i}, sortField=${sortField}, sortDir=${sortDir})}"
+                   th:text="${i+1}"></a>
+            </li>
+
+            <li th:classappend="${currentPage == totalPages-1} ? 'disabled'" class="page-item">
+                <a class="page-link"
+                   th:href="@{/students(page=${currentPage+1}, sortField=${sortField}, sortDir=${sortDir})}">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</body>
+</html>
